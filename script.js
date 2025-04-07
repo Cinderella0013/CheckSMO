@@ -74,7 +74,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const studentId = studentIdInput.value;
 
         // ส่งข้อมูลไปยัง Google Form หรือ Backend
-        const googleFormUrl = "https://docs.google.com/spreadsheets/d/1kQ9AvM53HFXSY8rW9MsqUm-viZIhTS-8wa1MGwiWraM/edit?usp=sharing"; // แทนที่ด้วย URL ของฟอร์มคุณ
+        const googleFormUrl = "https://docs.google.com/forms/d/e/1FAIpQLSfskGbqUt07_uaLxVjqFaKhMByEZ_du5GPp0GvznNgmVfVFvQ/viewform?usp=dialog"; 
         const formData = new FormData();
         formData.append("entry.123456789", name); // แทนที่ entry.xxx ด้วยค่า entry ของฟิลด์ใน Google Form
         formData.append("entry.987654321", studentId);
