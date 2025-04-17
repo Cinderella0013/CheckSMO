@@ -16,14 +16,14 @@ document.addEventListener("DOMContentLoaded", () => {
         "673380123-8", "673380111-5", "663380024-9"
     ];
 
-    // // พิกัดของ SC09 คณะวิทยาศาสตร์ มข.
-    // const allowedLatitude = 16.4756894;
-    // const allowedLongitude = 102.8251242;
-    // const radius = 0.0005; // ประมาณ 50 เมตร
-    // พิกัดของ ทดสอบ
-    const allowedLatitude = 16.463014;
-    const allowedLongitude = 102.823627;
+    // พิกัดของ SC09 คณะวิทยาศาสตร์ มข.
+    const allowedLatitude = 16.4756894;
+    const allowedLongitude = 102.8251242;
     const radius = 0.0005; // ประมาณ 50 เมตร
+    // // พิกัดของ ทดสอบ
+    // const allowedLatitude = 16.463014;
+    // const allowedLongitude = 102.823627;
+    // const radius = 0.0005; // ประมาณ 50 เมตร
 
     let isLocationValid = false;
     let isStudentIdValid = false;
