@@ -21,8 +21,8 @@ document.addEventListener("DOMContentLoaded", () => {
     // const allowedLongitude = 102.8251242;
     // const radius = 0.0005; // ประมาณ 50 เมตร
     // พิกัดของ ทดสอบ
-    const allowedLatitude = 16.463044140532077;
-    const allowedLongitude = 102.8236292862173;
+    const allowedLatitude = 16.463014;
+    const allowedLongitude = 102.823627;
     const radius = 0.0005; // ประมาณ 50 เมตร
 
     let isLocationValid = false;
