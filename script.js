@@ -37,7 +37,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         if (distance < radius) {
             isLocationValid = true;
-            statusText.textContent = "อยู่ในพื้นที่ กรุณากรอกรหัสนักศึกษา";
+            statusText.textContent = "คุณอยู่ในพื้นที่ทำงานแล้ว กรอกข้อมูลเลยยย";
         } else {
             isLocationValid = false;
             statusText.textContent = "คุณอยู่นอกพื้นที่ทำงานนนนนนนนน";
@@ -82,7 +82,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const now = Date.now();
 
         if (lastCheckIn && now - parseInt(lastCheckIn) < 3600000) {
-            alert("คุณได้เช็กชื่อไปแล้วใน 1 ชั่วโมงที่ผ่านมา กรุณารออีกสักครู่");
+            alert("คุณได้เช็กชื่อไปแล้ว เช็คให้เพื่อนไม่ได้นะ!!!!!");
             return;
         }
 
