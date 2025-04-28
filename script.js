@@ -77,7 +77,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const name = document.getElementById("name").value;
         const studentId = studentIdInput.value.trim();
 
-        const key = `checkin_${studentId}`;
+        const key = `checkin_device`;
         const lastCheckIn = localStorage.getItem(key);
         const now = Date.now();
 
