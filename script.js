@@ -73,33 +73,63 @@ document.addEventListener("DOMContentLoaded", () => {
     // เมื่อกดปุ่มยืนยัน
     document.getElementById("attendanceForm").addEventListener("submit", (event) => {
         event.preventDefault();
-
-        const name = document.getElementById("name").value;
+    
+        const name = document.getElementById("name").value.trim();
         const studentId = studentIdInput.value.trim();
-
-        const key = `checkin_device`;
-        const lastCheckIn = localStorage.getItem(key);
-        const now = Date.now();
-
-        if (lastCheckIn && now - parseInt(lastCheckIn) < 3600000) {
-            alert("คุณได้เช็กชื่อไปแล้ว เช็คให้เพื่อนไม่ได้นะ!!!!!");
+    
+        if (!name || !studentId) {
+            alert("กรุณากรอกข้อมูลให้ครบถ้วน");
             return;
         }
-
-        const googleFormUrl = "https://docs.google.com/forms/d/e/1FAIpQLSfskGbqUt07_uaLxVjqFaKhMByEZ_du5GPp0GvznNgmVfVFvQ/formResponse";
-        const formData = new FormData();
-        formData.append("entry.21734374", name); // ช่องชื่อ
-        formData.append("entry.1103605559", studentId); // ช่องรหัสนักศึกษา
-
-        fetch(googleFormUrl, {
-            method: "POST",
-            mode: "no-cors",
-            body: formData,
-        }).then(() => {
-            localStorage.setItem(key, now.toString());
-            alert("เช็กชื่อสำเร็จ!");
-        }).catch(() => {
-            alert("เกิดข้อผิดพลาดในการส่งข้อมูล");
-        });
+    
+        // ป้องกัน spam submit
+        if (submitBtn.disabled) return;
+    
+        submitBtn.disabled = true;
+        submitBtn.textContent = "กำลังส่ง...";
+    
+        fetch("https://api64.ipify.org?format=json")
+            .then(response => response.json())
+            .then(data => {
+                const ip = data.ip;
+                const key = `checkin_ip_${ip}`;
+                const lastCheck = localStorage.getItem(key);
+                const now = Date.now();
+    
+                if (lastCheck && now - parseInt(lastCheck) < 3600000) {
+                    alert("เครื่องนี้เคยเช็กชื่อไปแล้ว");
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = "ยืนยัน";
+                    return;
+                }
+    
+                const googleFormUrl = "https://docs.google.com/forms/d/e/1FAIpQLSfskGbqUt07_uaLxVjqFaKhMByEZ_du5GPp0GvznNgmVfVFvQ/formResponse";
+                const formData = new FormData();
+                formData.append("entry.21734374", name);
+                formData.append("entry.1103605559", studentId);
+    
+                fetch(googleFormUrl, {
+                    method: "POST",
+                    mode: "no-cors",
+                    body: formData,
+                }).then(() => {
+                    localStorage.setItem(key, now.toString());
+                    alert("เช็กชื่อสำเร็จ!");
+                }).catch(() => {
+                    alert("เกิดข้อผิดพลาดในการส่งข้อมูล");
+                }).finally(() => {
+                    // รอ 3 วินาทีแล้วเปิดปุ่มกลับ (หรือจะไม่เปิดเลยก็ได้)
+                    setTimeout(() => {
+                        submitBtn.disabled = true; // ไม่เปิดใหม่ เพราะระบบล็อกด้วย IP แล้ว
+                        submitBtn.textContent = "ยืนยัน";
+                    }, 3000);
+                });
+    
+            }).catch(() => {
+                alert("ไม่สามารถตรวจสอบ IP ได้ กรุณาลองใหม่");
+                submitBtn.disabled = false;
+                submitBtn.textContent = "ยืนยัน";
+            });
     });
+    
 });
