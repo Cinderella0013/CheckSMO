@@ -73,63 +73,90 @@ document.addEventListener("DOMContentLoaded", () => {
     // เมื่อกดปุ่มยืนยัน
     document.getElementById("attendanceForm").addEventListener("submit", (event) => {
         event.preventDefault();
-    
+      
         const name = document.getElementById("name").value.trim();
-        const studentId = studentIdInput.value.trim();
-    
-        if (!name || !studentId) {
-            alert("กรุณากรอกข้อมูลให้ครบถ้วน");
-            return;
+        const studentId = document.getElementById("studentId").value.trim();
+        const pictureFile = document.getElementById("picture").files[0];
+        const submitBtn = document.getElementById("submitBtn");
+      
+        if (!name || !studentId || !pictureFile) {
+          alert("กรุณากรอกข้อมูลให้ครบถ้วนและเลือกรูป");
+          return;
         }
-    
-        // ป้องกัน spam submit
-        if (submitBtn.disabled) return;
-    
-        submitBtn.disabled = true;
-        submitBtn.textContent = "กำลังส่ง...";
-    
-        fetch("https://api64.ipify.org?format=json")
-            .then(response => response.json())
-            .then(data => {
+      
+        const reader = new FileReader();
+        reader.readAsDataURL(pictureFile);
+      
+        reader.onload = async () => {
+          const base64Image = reader.result.replace(/^data:image\/[a-z]+;base64,/, "");
+      
+          const imgbbApiKey = "d53b7880a06ef7041ae63a89a8646d6a"; // ✅ API KEY ที่คุณให้มา
+          const imgbbUrl = "https://api.imgbb.com/1/upload?key=" + imgbbApiKey;
+      
+          const form = new FormData();
+          form.append("image", base64Image);
+      
+          try {
+            const uploadResponse = await fetch(imgbbUrl, {
+              method: "POST",
+              body: form,
+            });
+      
+            const json = await uploadResponse.json();
+            const imageUrl = json.data.url; // ✅ ลิงก์ภาพที่ได้
+      
+            if (submitBtn.disabled) return;
+            submitBtn.disabled = true;
+            submitBtn.textContent = "กำลังส่ง...";
+      
+            fetch("https://api64.ipify.org?format=json")
+              .then(response => response.json())
+              .then(data => {
                 const ip = data.ip;
                 const key = `checkin_ip_${ip}`;
                 const lastCheck = localStorage.getItem(key);
                 const now = Date.now();
-    
+      
                 if (lastCheck && now - parseInt(lastCheck) < 3600000) {
-                    alert("เครื่องนี้เคยเช็กชื่อไปแล้ว");
-                    submitBtn.disabled = false;
-                    submitBtn.textContent = "ยืนยัน";
-                    return;
+                  alert("เครื่องนี้เคยเช็กชื่อไปแล้ว");
+                  submitBtn.disabled = false;
+                  submitBtn.textContent = "ยืนยัน";
+                  return;
                 }
-    
+      
                 const googleFormUrl = "https://docs.google.com/forms/d/e/1FAIpQLSfskGbqUt07_uaLxVjqFaKhMByEZ_du5GPp0GvznNgmVfVFvQ/formResponse";
                 const formData = new FormData();
-                formData.append("entry.21734374", name);
-                formData.append("entry.1103605559", studentId);
-    
+                formData.append("entry.21734374", name);          // ช่องชื่อ
+                formData.append("entry.1103605559", studentId);   // ช่องรหัสนักศึกษา
+                formData.append("entry.269578723", imageUrl);     // ✅ ส่ง URL ภาพที่ได้
+      
                 fetch(googleFormUrl, {
-                    method: "POST",
-                    mode: "no-cors",
-                    body: formData,
+                  method: "POST",
+                  mode: "no-cors",
+                  body: formData,
                 }).then(() => {
-                    localStorage.setItem(key, now.toString());
-                    alert("เช็กชื่อสำเร็จ!");
+                  localStorage.setItem(key, now.toString());
+                  alert("เช็กชื่อสำเร็จ!");
                 }).catch(() => {
-                    alert("เกิดข้อผิดพลาดในการส่งข้อมูล");
+                  alert("เกิดข้อผิดพลาดในการส่งข้อมูล");
                 }).finally(() => {
-                    // รอ 3 วินาทีแล้วเปิดปุ่มกลับ (หรือจะไม่เปิดเลยก็ได้)
-                    setTimeout(() => {
-                        submitBtn.disabled = true; // ไม่เปิดใหม่ เพราะระบบล็อกด้วย IP แล้ว
-                        submitBtn.textContent = "ยืนยัน";
-                    }, 3000);
+                  setTimeout(() => {
+                    submitBtn.disabled = true;
+                    submitBtn.textContent = "ยืนยัน";
+                  }, 3000);
                 });
-    
-            }).catch(() => {
+      
+              }).catch(() => {
                 alert("ไม่สามารถตรวจสอบ IP ได้ กรุณาลองใหม่");
                 submitBtn.disabled = false;
                 submitBtn.textContent = "ยืนยัน";
-            });
-    });
+              });
+      
+          } catch (error) {
+            console.error("การอัปโหลดรูปผิดพลาด:", error);
+            alert("อัปโหลดรูปไม่สำเร็จ กรุณาลองใหม่");
+          }
+        };
+      });      
     
 });
