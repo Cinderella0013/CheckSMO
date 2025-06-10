@@ -86,24 +86,27 @@ document.addEventListener("DOMContentLoaded", () => {
       
         const reader = new FileReader();
         reader.readAsDataURL(pictureFile);
-      
+
         reader.onload = async () => {
-          const base64Image = reader.result.replace(/^data:image\/[a-z]+;base64,/, "");
-      
-          const imgbbApiKey = "d53b7880a06ef7041ae63a89a8646d6a"; // ✅ API KEY ที่คุณให้มา
-          const imgbbUrl = "https://api.imgbb.com/1/upload?key=" + imgbbApiKey;
-      
-          const form = new FormData();
-          form.append("image", base64Image);
-      
-          try {
-            const uploadResponse = await fetch(imgbbUrl, {
-              method: "POST",
-              body: form,
-            });
-      
-            const json = await uploadResponse.json();
-            const imageUrl = json.data.url; // ✅ ลิงก์ภาพที่ได้
+            const base64Image = reader.result.replace(/^data:image\/[a-z]+;base64,/, "");
+
+            const driveUploadUrl = "https://script.google.com/macros/s/AKfycbzrM0lhCYyz8yGgmVHAcHqOWXL9j_8s9Is29zkQUjdJtcn-SNZMEr0nUBgbpvV39CMXuA/exec";
+
+            try {
+                const uploadRes = await fetch(driveUploadUrl, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        image: base64Image,
+                        name: `${studentId}_${Date.now()}`
+                    })
+                });
+
+                const json = await uploadRes.json();
+                if (!json.success) throw new Error(json.error);
+
+                const imageUrl = json.url;
+
       
             if (submitBtn.disabled) return;
             submitBtn.disabled = true;
